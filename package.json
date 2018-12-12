@@ -4,7 +4,8 @@
   "description": "javascript library for progressive web apps",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -15,10 +16,15 @@
     "progressiveweb",
     "javascript"
   ],
-  "author": "navkm",
+  "author": "navkm.dev@gmail.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/navkm/progressifyjs/issues"
   },
-  "homepage": "https://github.com/navkm/progressifyjs#readme"
+  "homepage": "https://github.com/navkm/progressifyjs#readme",
+  "devDependencies": {
+    "rollup": "^0.67.4",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-strip": "^1.2.0"
+  }
 }
