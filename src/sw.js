@@ -1,9 +1,12 @@
 
-import {log_sw} from './utils.js';
+import {log_sw} from './utils.js';;
+import {Router} from './router.js';
+import {Config} from './config.js';
+
 const DB_NAME = 'progressify';
 const CONFIG_OBJECT_STORE = 'config';
-var configObject;
 
+var router;
 const moduleExports ={};
 moduleExports.sw ={};
 
@@ -22,7 +25,9 @@ moduleExports.sw.init=()=> {
                 log_sw('objectStore' + objectStore);
                 let request = objectStore.get(1);
                 request.onsuccess = function (e) {
-                    configObject = e.target.result;
+                    const configObject = e.target.result;
+                    router=new Router(Config.fromObject(configObject));
+                    log_sw('Router is '+router);    
                 };
                 resolve(idbOpenRequest.result);
             }
@@ -35,25 +40,15 @@ moduleExports.sw.init=()=> {
         return self.clients.claim();
     });
     
-   // self.addEventListener('fetch', handleFetch);
+   self.addEventListener('fetch', handleFetch);
 
 }
 
-/*
+
 function handleFetch(event){
-    console.log_sw('SW:handleFetch');
-    console.dir(configObject);
-    caches.match(event.request)
-        .then(function(){
+    router.route(event)
+}
 
-        }).else(function(){
-            
-        });
-
-    event.respondWith(fetch(event.request));
-
-   }
-   */
 
 /*
  * Export the public API

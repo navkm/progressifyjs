@@ -15,7 +15,7 @@ export default [
                 debugger: true,
 
                 // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug', 'alert'],
+                functions: ['console1.log', 'assert.*', 'debug', 'alert'],
 
                 // set this to `false` if you're not using sourcemaps –
                 // defaults to `true`
@@ -39,7 +39,7 @@ export default [
                 debugger: true,
 
                 // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug', 'alert'],
+                functions: ['console1.log', 'assert.*', 'debug', 'alert'],
 
                 // set this to `false` if you're not using sourcemaps –
                 // defaults to `true`
