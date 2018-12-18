@@ -19,16 +19,22 @@ function registerServiceWorker(swPath) {
  * @function pwa_init
  *
  */
-moduleExports.pwa.init = (swPath = "/sw.js",config=null) => {
-  log_pwa("Initing Progressive Web App after window load");
+moduleExports.pwa.init = (swPath = "/sw.js", config = null) => {
+  log_pwa("Verifying if progressify is supported on this browser ..");
   // check for support for IndexedDB and serviceworker
   if (window.indexedDB && navigator.serviceWorker) {
-    log_pwa("IndexedDB and ServiceWorkers are supported on thie browser");
-    initAndCreateConfig(swPath,config);
+    log_pwa("IndexedDB and ServiceWorkers are supported on this browser");
+    log_pwa(
+      "Initializing Progressive Web App. Service Worker registered from path: " +
+        swPath
+    );
+    initAndCreateConfig(swPath, config);
+  } else {
+    log_pwa("Verification failed. Exiting unsupported browser !");
   }
 };
 
-function initAndCreateConfig(swPath,config) {
+function initAndCreateConfig(swPath, config) {
   const idbOpenRequest = window.indexedDB.open(DB_NAME);
   // DDL - Define schemas
   // Init and Indexed DB and create an object store for the config object
@@ -43,35 +49,50 @@ function initAndCreateConfig(swPath,config) {
   // This is called each time the app is loaded
   // Check if a config object exists, if not create one
   idbOpenRequest.onsuccess = function(event) {
-    log_pwa("idbOpenRequest.onsuccess called");
+    log_pwa("Successfully opened IDB named:" + DB_NAME);
     const idbDatabase = event.target.result; //IDBDatabase
     const txn = idbDatabase.transaction([CONFIG_OBJECT_STORE], "readwrite");
     const objectStore = txn.objectStore(CONFIG_OBJECT_STORE); // IDBObjectStore
+    log_pwa(
+      "Retrieving config object from the Object Store named:" +
+        CONFIG_OBJECT_STORE
+    );
     let request = objectStore.get(1);
     request.onsuccess = function(e) {
       let oldConfigObj = e.target.result;
       let newConfigObject;
-      if(!oldConfigObj){
-          if(!config){
-            // No existing config object. Neither was a new one passed
-            // Create a new default config object and persist
-            newConfigObject = createDefaultConfigObject();
-            objectStore.add(newConfigObject);
-          } else{
-              // use the passed config object and persist
-            newConfigObject = config;
-            objectStore.add(newConfigObject);
-          }
-      } else{
+      if (!oldConfigObj) {
+        log_pwa("No existing config object found !");
+        if (!config) {
+          log_pwa(
+            "No config object param either. Hence create a new default config"
+          );
+          // No existing config object. Neither was a new one passed
+          // Create a new default config object and persist
+          newConfigObject = createDefaultConfigObject();
+          objectStore.add(newConfigObject);
+        } else {
+          log_pwa("Persist the config object param to the Object Store");
+          // use the passed config object and persist
+          newConfigObject = config;
+          objectStore.add(newConfigObject);
+        }
+      } else {
         //Use the new config.
-        //TBD - perform upgrade actions based on diff
-        if(config){
-            newConfigObject = config;
-            objectStore.add(newConfigObject);
+
+        if (config) {
+          log_pwa(
+            "Found existing config & config obj param. Use param as source of truth"
+          );
+          //TBD - perform upgrade actions based on diff
+          newConfigObject = config;
+          objectStore.add(newConfigObject);
         }
       }
-      
-      log_pwa("New config Object added to the object store. Register SW now :" + swPath);
+      log_pwa(
+        "Config Object added to the object store. Proceed to register Service Worker at path:" +
+          swPath
+      );
       registerServiceWorker(swPath);
     };
   };
