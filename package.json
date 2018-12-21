@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c rollup.config.js",
-    "build-dev": "rollup -c rollup.config.dev.js"
+    "build": "npm run clean && rollup -c rollup.config.js && npm run minify_sw && npm run minify_pwa",
+    "build-dev": "npm run clean &&  rollup -c rollup.config.dev.js",
+    "minify_sw":"terser dist/progressify-sw.js -o dist/progressify-sw.js --mangle",
+    "minify_pwa":"terser dist/progressify-pwa.js -o dist/progressify-pwa.js --mangle",
+    "clean":"rm -rf dist/*"
+
   },
   "repository": {
     "type": "git",
@@ -26,6 +30,7 @@
   "devDependencies": {
     "rollup": "^0.67.4",
     "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-strip": "^1.2.0"
+    "rollup-plugin-strip": "^1.2.0",
+    "terser": "^3.13.1"
   }
 }
