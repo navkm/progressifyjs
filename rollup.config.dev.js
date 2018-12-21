@@ -12,7 +12,7 @@ export default [
             resolve(),
             strip({
                 debugger: true,
-                functions: ['console.log', 'log_pwa'],
+                functions: [],
                 sourceMap: false
             })
         ]
@@ -28,9 +28,10 @@ export default [
             resolve(),
             strip({
                 debugger: true,
-                functions: ['console.log', 'log_sw'],
+                functions: [],
                 sourceMap: false
             })
+            
         ]
     }
 ]
