@@ -30,6 +30,6 @@
     "rollup": "^0.67.4",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-strip": "^1.2.1",
-    "terser": "^3.14.0"
+    "terser": "^3.14.1"
   }
 }

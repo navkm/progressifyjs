@@ -8,6 +8,9 @@ function log_sw(msg){
     console.log('%c progressify: Service Worker  ','background:orange;color:white;padding: 2px,0.5em;border-radius:0.5em',msg);
 }
 
-export {log_pwa,log_sw};
+function log_debug(msg){
+    console.log('%c progressify: Debug  ','background:red;color:white;padding: 2px,0.5em;border-radius:0.5em',msg);
+}
+export {log_pwa,log_sw,log_debug};
 
 

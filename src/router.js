@@ -1,5 +1,7 @@
 import { Config } from "./config.js";
-import { log_sw } from "./utils.js";
+import { log_sw, log_debug } from "./utils.js";
+
+const CACHE_NAME = "progressify-cache";
 
 export class Router {
   constructor(config) {
@@ -39,16 +41,19 @@ export class Router {
   }
 
   processCached(fetchEvent) {
+    var self = this;
     log_sw("Processing Cached Path: " + fetchEvent.request.url);
     fetchEvent.respondWith(
       caches.match(fetchEvent.request).then(function(response) {
         if (response) {
+          // The response has been found in cache. However, we still need to revalidate
+          self.revalidate(fetchEvent);
           log_sw("Responding from cache");
           return response;
         } else {
           log_sw("No cached copy yet. Retrieve from network and cache a clone");
           return fetch(fetchEvent.request).then(function(newResponse) {
-            return caches.open("progressify-cache").then(function(cache) {
+            return caches.open(CACHE_NAME).then(function(cache) {
               cache.put(fetchEvent.request.url, newResponse.clone());
               log_sw("---Router Fetch Event END---" + fetchEvent.timeStamp);
               return newResponse;
@@ -63,5 +68,16 @@ export class Router {
     log_sw("Processing NOT Cached Path: " + fetchEvent.request.url);
     fetchEvent.respondWith(fetch(fetchEvent.request));
     log_sw("---Router Fetch Event END---" + fetchEvent.timeStamp);
+  }
+
+  revalidate(fetchEvent){
+    log_sw("Revalidate initated for :"+fetchEvent.request.url);
+    fetch(fetchEvent.request).then(function (newResponse){
+      log_sw("Revalidate response received :"+fetchEvent.request.url);
+      caches.open(CACHE_NAME).then(function(cache){
+        log_sw("Revalidate cache update :"+fetchEvent.request.url);
+        cache.put(fetchEvent.request.url, newResponse);
+      });
+    });
   }
 }

@@ -1,1 +1,142 @@
-var progressify=function(){"use strict";class t{constructor(t=1,e=[],n=1,s=(new Date).getTime(),i="flush"){this.id=t;this.cache=e;this.version=n;this.timestamp=s;this.onUpgrade=i}getItemsToCache(){return this.cache}toString(){return JSON.stringify(this)}addPathToCache(t){this.cache.push({path:t})}static getDefaultConfig(){const e=new t;e.addPathToCache(".*");return e}static fromObject(e){return new t(e.id,e.cache,e.version,e.timestamp,e.onUpgrade)}}const e="progressify";const n="config";const s={};s.pwa={};function i(t){navigator.serviceWorker.register(t).then(function(){})}s.pwa.init=((t="/sw.js",e=null)=>{if(window.indexedDB&&navigator.serviceWorker){r(t,e)}});function r(t,s){const r=window.indexedDB.open(e);r.onupgradeneeded=function(t){const e=t.target.result;if(!e.objectStoreNames.contains(n)){e.createObjectStore(n,{keyPath:"id"})}};r.onsuccess=function(e){const r=e.target.result;const c=r.transaction([n],"readwrite");const a=c.objectStore(n);let u=a.get(1);u.onsuccess=function(e){let n=e.target.result;let r;if(!n){if(!s){r=o();a.add(r)}else{r=s;a.add(r)}}else{if(s){r=s;a.add(r)}}i(t)}}}function o(){let e=t.getDefaultConfig();return e}return s}();
+var progressify = (function () {
+    'use strict';
+
+    function log_pwa(msg){
+        console.log('%c progressify: Web Application ','background:blue;color:white;padding: 2px,0.5em;border-radius:0.5em',msg);
+    }
+
+    class Config {
+        constructor(id=1,cache=[],version=1,timestamp=(new Date()).getTime(),onUpgrade='flush') {
+            this.id=id;
+            this.cache=cache;
+            this.version=version;
+            this.timestamp=timestamp;
+            this.onUpgrade=onUpgrade;
+        }
+        getItemsToCache(){
+            return this.cache;
+        }
+
+        toString(){
+            return JSON.stringify(this);
+        }
+
+        addPathToCache(path){
+           this.cache.push({"path":path});
+        }
+
+        static getDefaultConfig(){
+            const config = new Config();
+            config.addPathToCache(".*");
+            return config;
+        }
+        // From a JSON Object
+        static fromObject(obj){
+            return new Config(obj.id,obj.cache,obj.version,obj.timestamp,obj.onUpgrade);
+        }
+    }
+
+    const DB_NAME = "progressify";
+    const CONFIG_OBJECT_STORE = "config";
+
+    const moduleExports = {};
+    moduleExports.pwa = {};
+
+    function registerServiceWorker(swPath) {
+      log_pwa("Register SW for path: " + swPath);
+      navigator.serviceWorker.register(swPath).then(function() {
+        log_pwa("SW successfully registered !");
+      });
+    }
+
+    /**
+     * @namespace progressify
+     * @function pwa_init
+     *
+     */
+    moduleExports.pwa.init = (swPath = "/sw.js", config = null) => {
+      log_pwa("Verifying if progressify is supported on this browser ..");
+      // check for support for IndexedDB and serviceworker
+      if (window.indexedDB && navigator.serviceWorker) {
+        log_pwa("IndexedDB and ServiceWorkers are supported on this browser");
+        log_pwa(
+          "Initializing Progressive Web App. Service Worker registered from path: " +
+            swPath
+        );
+        initAndCreateConfig(swPath, config);
+      } else {
+        log_pwa("Verification failed. Exiting unsupported browser !");
+      }
+    };
+
+    function initAndCreateConfig(swPath, config) {
+      const idbOpenRequest = window.indexedDB.open(DB_NAME);
+      // DDL - Define schemas
+      // Init and Indexed DB and create an object store for the config object
+      // This happens only the first time for a new browser
+      idbOpenRequest.onupgradeneeded = function(event) {
+        const idbDatabase = event.target.result;
+        if (!idbDatabase.objectStoreNames.contains(CONFIG_OBJECT_STORE)) {
+          idbDatabase.createObjectStore(CONFIG_OBJECT_STORE, { keyPath: "id" });
+        }
+      };
+      // DML
+      // This is called each time the app is loaded
+      // Check if a config object exists, if not create one
+      idbOpenRequest.onsuccess = function(event) {
+        log_pwa("Successfully opened IDB named:" + DB_NAME);
+        const idbDatabase = event.target.result; //IDBDatabase
+        const txn = idbDatabase.transaction([CONFIG_OBJECT_STORE], "readwrite");
+        const objectStore = txn.objectStore(CONFIG_OBJECT_STORE); // IDBObjectStore
+        log_pwa(
+          "Retrieving config object from the Object Store named:" +
+            CONFIG_OBJECT_STORE
+        );
+        let request = objectStore.get(1);
+        request.onsuccess = function(e) {
+          let oldConfigObj = e.target.result;
+          let newConfigObject;
+          if (!oldConfigObj) {
+            log_pwa("No existing config object found !");
+            if (!config) {
+              log_pwa(
+                "No config object param either. Hence create a new default config"
+              );
+              // No existing config object. Neither was a new one passed
+              // Create a new default config object and persist
+              newConfigObject = createDefaultConfigObject();
+              objectStore.add(newConfigObject);
+            } else {
+              log_pwa("Persist the config object param to the Object Store");
+              // use the passed config object and persist
+              newConfigObject = config;
+              objectStore.add(newConfigObject);
+            }
+          } else {
+            //Use the new config.
+
+            if (config) {
+              log_pwa(
+                "Found existing config & config obj param. Use param as source of truth"
+              );
+              //TBD - perform upgrade actions based on diff
+              newConfigObject = config;
+              objectStore.add(newConfigObject);
+            }
+          }
+          log_pwa(
+            "Config Object added to the object store. Proceed to register Service Worker at path:" +
+              swPath
+          );
+          registerServiceWorker(swPath);
+        };
+      };
+    }
+    function createDefaultConfigObject() {
+      let cfg = Config.getDefaultConfig();
+      return cfg;
+    }
+
+    return moduleExports;
+
+}());
