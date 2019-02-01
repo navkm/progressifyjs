@@ -7,7 +7,26 @@ const CONFIG_OBJECT_STORE = "config";
 
 var router;
 const moduleExports = {};
+
+/**
+ * progressifyjs.sw is the serviceworker javascript
+ *
+ * 
+ * @namespace  sw
+ * @memberof progressify
+ *
+ */
 moduleExports.sw = {};
+
+/**
+ * TBD: Describe the init method 
+ * 
+ *
+ * 
+ * @method init
+ * @memberof progressify.sw
+ *
+ */
 
 moduleExports.sw.init = () => {
   log_sw("Service Worker init called. Add a listener to the install event");

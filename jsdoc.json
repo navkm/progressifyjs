@@ -1,0 +1,11 @@
+{
+    "source": {
+        "include": [ "src/pwa.js","src/sw.js" ]
+    },
+    
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        }
+    }
+}

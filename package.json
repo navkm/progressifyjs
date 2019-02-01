@@ -9,7 +9,8 @@
     "build-dev": "npm run clean &&  rollup -c rollup.config.dev.js",
     "minify_sw": "terser dist/progressify-sw.js -o dist/progressify-sw.js --mangle",
     "minify_pwa": "terser dist/progressify-pwa.js -o dist/progressify-pwa.js --mangle",
-    "clean": "rm -rf dist/*"
+    "clean": "rm -rf dist/* out/*",
+    "docs": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   },
   "homepage": "https://github.com/navkm/progressifyjs#readme",
   "devDependencies": {
+    "jsdoc": "^3.5.5",
     "rollup": "^0.67.4",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-strip": "^1.2.1",

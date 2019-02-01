@@ -1,3 +1,12 @@
+/**
+ * progressifyjs consists of two distinct components:<br/>
+ * progressifyjs.pwa is the component that needs to be included in your HTML page<br/>
+ * <b>progressifyjs.sw</b> is the service worker component
+ * 
+ * @namespace  progressify
+ *
+ */
+
 import { log_pwa } from "./utils.js";
 import { Config } from "./config.js";
 
@@ -5,6 +14,17 @@ const DB_NAME = "progressify";
 const CONFIG_OBJECT_STORE = "config";
 
 const moduleExports = {};
+
+/**
+ * progressifyjs.pwa is the page javascript
+ *
+ * 
+ * @namespace  pwa
+ * @memberof progressify
+ *
+ */
+
+
 moduleExports.pwa = {};
 
 function registerServiceWorker(swPath) {
@@ -15,8 +35,12 @@ function registerServiceWorker(swPath) {
 }
 
 /**
- * @namespace progressify
- * @function pwa_init
+ * 
+ * TBD: Describe the init method 
+ *
+ * 
+ * @method init
+ * @memberof progressify.pwa
  *
  */
 moduleExports.pwa.init = (swPath = "/sw.js", config = null) => {
