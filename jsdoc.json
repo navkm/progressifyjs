@@ -7,5 +7,8 @@
         "default": {
             "outputSourceFiles": false
         }
+    },
+    "opts": {
+        "destination": "./docs/"
     }
 }
