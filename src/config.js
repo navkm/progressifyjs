@@ -1,4 +1,15 @@
-export class Config {
+/**
+ * The configuration object
+ *
+ * @memberof progressify.pwa
+ */
+class Config {
+    
+  /**
+   * @description <font color='red'>This constructor is for internal use only</font>. All clients must use 
+   * the {@link progressify.pwa.newConfig} method to create a new Config object
+   * 
+   */
     constructor(id=1,cache=[],version=1,timestamp=(new Date()).getTime(),onUpgrade='flush') {
         this.id=id;
         this.cache=cache;
@@ -6,6 +17,8 @@ export class Config {
         this.timestamp=timestamp;
         this.onUpgrade=onUpgrade;
     }
+
+
     getItemsToCache(){
         return this.cache;
     }
@@ -19,8 +32,13 @@ export class Config {
     }
 
     static getDefaultConfig(){
-        const config = new Config();
+        const config = this.createConfigObject();
         config.addPathToCache(".*");
+        return config;
+    }
+
+    static createConfigObject(){
+        const config = new Config();
         return config;
     }
     // From a JSON Object
@@ -29,3 +47,4 @@ export class Config {
     }
 }
 
+export  {Config};

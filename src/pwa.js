@@ -41,11 +41,10 @@ function registerServiceWorker(swPath) {
 /**
  * @description 
  * Initializes the library
- *
  * 
  * @method init
  * @param {string} [swPath=/sw.js] - Path to the service worker library
- * @param {object} [config] - The config object
+ * @param {progressify.pwa.Config} [config] - The config object
  * @returns void
  * @memberof progressify.pwa
  *
@@ -100,7 +99,7 @@ function initAndCreateConfig(swPath, config) {
           );
           // No existing config object. Neither was a new one passed
           // Create a new default config object and persist
-          newConfigObject = createDefaultConfigObject();
+          newConfigObject = Config.getDefaultConfig();
           objectStore.add(newConfigObject);
         } else {
           log_pwa("Persist the config object param to the Object Store");
@@ -128,9 +127,19 @@ function initAndCreateConfig(swPath, config) {
     };
   };
 }
-function createDefaultConfigObject() {
-  let cfg = Config.getDefaultConfig();
-  return cfg;
+
+/**
+ * @description 
+ * This is the recommended Factory method to create a new {@link progressify.pwa.Config} object
+ *
+ * 
+ * @method newConfig
+ * @memberof progressify.pwa
+ * @return {progressify.pwa.Config}
+ *
+ */
+moduleExports.pwa.newConfig = () => {
+  return Config.createConfigObject();
 }
 
 /*
