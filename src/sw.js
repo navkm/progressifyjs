@@ -9,7 +9,8 @@ var router;
 const moduleExports = {};
 
 /**
- * progressifyjs.sw is the serviceworker javascript
+ * @description 
+ * <font color='#0b18ba'>progressifyjs.sw</font> is the library that is used by the service worker
  *
  * 
  * @namespace  sw
@@ -19,11 +20,12 @@ const moduleExports = {};
 moduleExports.sw = {};
 
 /**
- * TBD: Describe the init method 
- * 
+ * @description 
+ * Initializes the service worker library
  *
  * 
  * @method init
+ * @returns void
  * @memberof progressify.sw
  *
  */

@@ -1,6 +1,6 @@
 {
     "source": {
-        "include": [ "src/pwa.js","src/sw.js" ]
+        "include": [ "src/pwa.js","src/sw.js","README.md" ]
     },
     
     "templates": {

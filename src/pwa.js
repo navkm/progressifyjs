@@ -1,8 +1,9 @@
 /**
- * progressifyjs consists of two distinct components:<br/>
- * progressifyjs.pwa is the component that needs to be included in your HTML page<br/>
- * <b>progressifyjs.sw</b> is the service worker component
- * 
+ * @description The progressifyjs library consists of two distinct components/namespaces:<br/>
+ * <ul>
+ * <li><font color='#0b18ba'>progressifyjs.pwa</font> is the library that is included in the HTML page </li>
+ * <li><font color='#0b18ba'>progressifyjs.sw</font> is the library that is used by the service worker</li>
+ * </ul>
  * @namespace  progressify
  *
  */
@@ -16,7 +17,10 @@ const CONFIG_OBJECT_STORE = "config";
 const moduleExports = {};
 
 /**
- * progressifyjs.pwa is the page javascript
+ * @description 
+ * <p>
+ * <font color='#0b18ba'>progressifyjs.pwa</font> is the library that is included in the HTML page.
+ *  </p>
  *
  * 
  * @namespace  pwa
@@ -35,11 +39,14 @@ function registerServiceWorker(swPath) {
 }
 
 /**
- * 
- * TBD: Describe the init method 
+ * @description 
+ * Initializes the library
  *
  * 
  * @method init
+ * @param {string} [swPath=/sw.js] - Path to the service worker library
+ * @param {object} [config] - The config object
+ * @returns void
  * @memberof progressify.pwa
  *
  */
