@@ -9,7 +9,7 @@
     "build-dev": "npm run clean &&  rollup -c rollup.config.dev.js",
     "minify_sw": "terser dist/progressify-sw.js -o dist/progressify-sw.js --mangle",
     "minify_pwa": "terser dist/progressify-pwa.js -o dist/progressify-pwa.js --mangle",
-    "clean": "rm -rf dist/* out/*",
+    "clean": "rm -rf dist/*",
     "docs": "jsdoc -c jsdoc.json"
   },
   "repository": {
