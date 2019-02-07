@@ -28,10 +28,11 @@
   },
   "homepage": "https://github.com/navkm/progressifyjs#readme",
   "devDependencies": {
+    "cypress": "^3.1.5",
     "jsdoc": "^3.5.5",
     "rollup": "^0.67.4",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-strip": "^1.2.1",
-    "terser": "^3.14.1"
+    "terser": "^3.16.1"
   }
 }
