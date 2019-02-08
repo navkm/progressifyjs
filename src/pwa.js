@@ -33,7 +33,7 @@ moduleExports.pwa = {};
 
 function registerServiceWorker(swPath) {
   log_pwa("Register SW for path: " + swPath);
-  navigator.serviceWorker.register(swPath).then(function() {
+  navigator.serviceWorker.register(swPath).then(function () {
     log_pwa("SW successfully registered !");
   });
 }
@@ -43,33 +43,29 @@ function registerServiceWorker(swPath) {
  * Initializes the library
  * 
  * @method init
- * @param {string} [swPath=/sw.js] - Path to the service worker library
  * @param {progressify.pwa.Config} [config] - The config object
  * @returns void
  * @memberof progressify.pwa
  *
  */
-moduleExports.pwa.init = (swPath = "/sw.js", config = null) => {
+moduleExports.pwa.init = (config = null) => {
   log_pwa("Verifying if progressify is supported on this browser ..");
   // check for support for IndexedDB and serviceworker
   if (window.indexedDB && navigator.serviceWorker) {
     log_pwa("IndexedDB and ServiceWorkers are supported on this browser");
-    log_pwa(
-      "Initializing Progressive Web App. Service Worker registered from path: " +
-        swPath
-    );
-    initAndCreateConfig(swPath, config);
+    initAndCreateConfig(config);
   } else {
     log_pwa("Verification failed. Exiting unsupported browser !");
   }
 };
 
-function initAndCreateConfig(swPath, config) {
+function initAndCreateConfig(config) {
+  let swPath = null;
   const idbOpenRequest = window.indexedDB.open(DB_NAME);
   // DDL - Define schemas
   // Init and Indexed DB and create an object store for the config object
   // This happens only the first time for a new browser
-  idbOpenRequest.onupgradeneeded = function(event) {
+  idbOpenRequest.onupgradeneeded = function (event) {
     const idbDatabase = event.target.result;
     if (!idbDatabase.objectStoreNames.contains(CONFIG_OBJECT_STORE)) {
       idbDatabase.createObjectStore(CONFIG_OBJECT_STORE, { keyPath: "id" });
@@ -78,17 +74,17 @@ function initAndCreateConfig(swPath, config) {
   // DML
   // This is called each time the app is loaded
   // Check if a config object exists, if not create one
-  idbOpenRequest.onsuccess = function(event) {
+  idbOpenRequest.onsuccess = function (event) {
     log_pwa("Successfully opened IDB named:" + DB_NAME);
     const idbDatabase = event.target.result; //IDBDatabase
     const txn = idbDatabase.transaction([CONFIG_OBJECT_STORE], "readwrite");
     const objectStore = txn.objectStore(CONFIG_OBJECT_STORE); // IDBObjectStore
     log_pwa(
       "Retrieving config object from the Object Store named:" +
-        CONFIG_OBJECT_STORE
+      CONFIG_OBJECT_STORE
     );
     let request = objectStore.get(1);
-    request.onsuccess = function(e) {
+    request.onsuccess = function (e) {
       let oldConfigObj = e.target.result;
       let newConfigObject;
       if (!oldConfigObj) {
@@ -101,13 +97,16 @@ function initAndCreateConfig(swPath, config) {
           // Create a new default config object and persist
           newConfigObject = Config.getDefaultConfig();
           objectStore.add(newConfigObject);
+          swPath = newConfigObject.swPath;
         } else {
           log_pwa("Persist the config object param to the Object Store");
           // use the passed config object and persist
           newConfigObject = config;
           objectStore.add(newConfigObject);
+          swPath = newConfigObject.swPath;
         }
       } else {
+        log_pwa("An existing config object was found");
         //Use the new config.
 
         if (config) {
@@ -118,28 +117,23 @@ function initAndCreateConfig(swPath, config) {
           newConfigObject = config;
           objectStore.add(newConfigObject);
         }
+        swPath = oldConfigObj.swPath;
       }
       log_pwa(
         "Config Object added to the object store. Proceed to register Service Worker at path:" +
-          swPath
+        swPath
+      );
+      log_pwa(
+        "Initializing Progressive Web App. Service Worker registered from path: " +
+        swPath
       );
       registerServiceWorker(swPath);
     };
   };
 }
 
-/**
- * @description 
- * This is the recommended Factory method to create a new {@link progressify.pwa.Config} object
- *
- * 
- * @method newConfig
- * @memberof progressify.pwa
- * @return {progressify.pwa.Config}
- *
- */
-moduleExports.pwa.newConfig = () => {
-  return Config.createConfigObject();
+moduleExports.pwa.Config = () => {
+  return new Config();
 }
 
 /*

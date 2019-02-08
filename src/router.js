@@ -22,7 +22,7 @@ export class Router {
 
     //Check if this URL needs to be cached
     let isCached = false;
-    for (var pathEntry of this.config.getItemsToCache()) {
+    for (var pathEntry of this.config.cache) {
       log_sw(
         "Matching :" + fetchEvent.request.url + " with :" + pathEntry.path
       );
