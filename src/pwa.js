@@ -10,6 +10,7 @@
 
 import { log_pwa } from "./utils.js";
 import { Config } from "./config.js";
+import { Condition,ConditionFactory } from "./condition.js";
 
 const DB_NAME = "progressify";
 const CONFIG_OBJECT_STORE = "config";
@@ -58,6 +59,7 @@ moduleExports.pwa.init = (config = null) => {
     log_pwa("Verification failed. Exiting unsupported browser !");
   }
 };
+
 
 function initAndCreateConfig(config) {
   let swPath = null;
@@ -135,6 +137,19 @@ function initAndCreateConfig(config) {
 moduleExports.pwa.Config = () => {
   return new Config();
 }
+
+
+moduleExports.pwa.Condition = () => {
+  return new Condition();
+}
+
+moduleExports.pwa.ConditionFactory = () => {
+  return new ConditionFactory();
+}
+
+//moduleExports.pwa.ConditionFactory = ConditionFactory;
+//ConditionFactory.ALWAYS=ConditionFactory.getConditionAlways();
+
 
 /*
  * Export the public API

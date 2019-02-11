@@ -1,3 +1,5 @@
+import { Condition,ConditionFactory } from "./condition.js";
+
 /**
  * 
  *
@@ -15,6 +17,8 @@ class Config {
     constructor() {
         this.id=1;
         this.cache=[];
+        this.noCache=[];
+        this.preCache=[];
         /** 
          * @member {string} 
          * @description The relative path (from the document root) of the serviceworker javascript file in 
@@ -37,26 +41,33 @@ class Config {
     }
 
     /**
-     * @description  Adds a given path to the cache
-     * @param {string} path The pathname that needs to be cached
+     * @description  Configures the service worker to cache any resource that matches the path expression
+     * @param {string} pathExpr A regular expression matching the path that needs to be configured
      */
-    addPathToCache(path){
-       this.cache.push({"path":path});
+    cachePath(pathExpr,opts){
+        if(!opts || (opts && Object.keys(opts).length === 0)){
+            this.cache.push({"p":pathExpr});
+        }else{
+            this.cache.push({"p":pathExpr,"o":opts});
+        }
     }
 
-    /**
-     * 
-     * @description Clear cached paths
-     * @return void
-     */
-    clearCachedPaths(){
-        //this.cache.push({"path":path});
-     }
+ 
+    cacheAllPaths(pathExprArray,opts){
+        if(!Array.isArray(pathExprArray)){
+            return;
+        }
+        for(let p of pathExprArray){
+            this.cachePath(p,opts);
+        }    
+    }
+
 
 
     static getDefaultConfig(){
         const config = new Config();
-        config.addPathToCache(".*");
+        const opts={'condition':new ConditionFactory().ALWAYS};
+        config.cachePath(".*",opts);
         return config;
     }
 
@@ -65,6 +76,9 @@ class Config {
         const c = new Config();
         c.id = obj.id;
         c.cache = obj.cache;
+        c.noCache=obj.noCache;
+        c.preCache=obj.preCache;
+        c.swPath=obj.swPath;
         return c;
     }
 }

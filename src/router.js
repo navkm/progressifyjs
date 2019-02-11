@@ -2,6 +2,10 @@ import { Config } from "./config.js";
 import { log_sw, log_debug } from "./utils.js";
 
 const CACHE_NAME = "progressify-cache";
+// constants
+const ACTION_CACHE='1';
+const ACTION_DONT_CACHE='2';
+
 
 export class Router {
   constructor(config) {
@@ -19,28 +23,52 @@ export class Router {
       log_sw("---Router Fetch Event END---" + fetchEvent.timeStamp);
       return;
     }
+    const r = this.determineAction(fetchEvent.request.url);
+    // return {'action':<ACTION_CONSTANT>,opts:<opts_obj>}
+    this.processAction(r.action,fetchEvent,r.opts);
+  }
 
-    //Check if this URL needs to be cached
-    let isCached = false;
-    for (var pathEntry of this.config.cache) {
-      log_sw(
-        "Matching :" + fetchEvent.request.url + " with :" + pathEntry.path
-      );
-      var mat = fetchEvent.request.url.match(pathEntry.path);
-      if (mat) {
-        log_sw("Match found. Breaking loop !");
-        isCached = true;
+  // Once the right action has been determined, this method processes the fetchEvent appropriately
+  processAction(action,fetchEvent,opts){
+
+    switch(action){
+
+      case  ACTION_CACHE:
+        this.processCached(fetchEvent,opts);
         break;
-      }
-    }
-    if (isCached) {
-      this.processCached(fetchEvent);
-    } else {
-      this.processNotCached(fetchEvent);
+      
+      case  ACTION_DONT_CACHE:  
+        this.processNotCached(fetchEvent,opts);
+        break;
+
     }
   }
 
-  processCached(fetchEvent) {
+  // Determines the apporpriate action that needs to be 
+  // taken for this GET URL. Returns an array of Action and options
+  // return {'action':<ACTION_CONSTANT>,opts:<opts_obj>}
+  determineAction(url) {
+
+     let returnVal = {}; 
+     returnVal.action=ACTION_DONT_CACHE;
+     for (var pathEntry of this.config.cache) {
+       const p = pathEntry.p;
+       log_sw(
+         "Matching :" + url+ " with :" + p
+       );
+       if (url.match(p)) {
+         log_sw("Match found. Breaking loop !");
+         returnVal.action=ACTION_CACHE;
+         if(pathEntry.o){
+          returnVal.opts=pathEntry.o;
+         }
+         break;
+       }
+     }     
+     return returnVal;
+  }
+
+  processCached(fetchEvent,opts) {
     var self = this;
     log_sw("Processing Cached Path: " + fetchEvent.request.url);
     fetchEvent.respondWith(
@@ -64,7 +92,7 @@ export class Router {
     );
   }
 
-  processNotCached(fetchEvent) {
+  processNotCached(fetchEvent,opts) {
     log_sw("Processing NOT Cached Path: " + fetchEvent.request.url);
     fetchEvent.respondWith(fetch(fetchEvent.request));
     log_sw("---Router Fetch Event END---" + fetchEvent.timeStamp);
